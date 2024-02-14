@@ -16,34 +16,43 @@ class Channel:
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.__channel_id = channel_id
-        self.channel = self.__youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
-
+        self.channel = self.get_service().channels().list(id=self.__channel_id, part='snippet,statistics').execute()
+        self.title = self.channel['items'][0]['snippet']['title']
+        self.description = self.channel['items'][0]['snippet']['description']
+        self.url = f"https://www.youtube.com/channel/{self.__channel_id}"
+        self.subscriber_count = self.channel['items'][0]['statistics']['subscriberCount']
+        self.video_count = self.channel['items'][0]['statistics']['videoCount']
+        self.view_count = self.channel['items'][0]['statistics']['viewCount']
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
         pprint(json.dumps(self.channel, indent=2, ensure_ascii=False))
 
     def to_json(self, file_name: str) -> None:
-        data = json.dumps(self.channel)
-        with open(file_name, 'w', encoding='utf-8') as f:
-            f.write(data)
+        """Сохраняет в Json файл значения атрибутов экземпляра - информацию о канале"""
+        data = {'channel_id': self.channel_id,
+                'title': self.title,
+                'description': self.description,
+                'url': self.url,
+                'subscriber_count': self.subscriber_count,
+                'video_count': self.video_count,
+                'view_count': self.view_count
+                }
+        with open(file_name, 'w', encoding='UTF-8') as file:
+            json.dump(data, file, ensure_ascii=False)
 
 
     @property
     def channel_id(self):
         return self.__channel_id
 
-    @property
-    def title(self):
-        # print(self.channel)
-        return self.channel['items'][0]['snippet']['title']
+    @channel_id.setter
+    def channel_id(self, value):
+        self.__channel_id = value
 
-    @property
-    def video_count(self):
-        return f'{moscowpython_list['items']['statistics']['videoCount']}'
-
-    @property
-    def url(self):
-        return f'{moscowpython_list['items']['snippet']['thumbnails']['url']}'
+    # @property
+    # def title(self):
+    #     # print(self.channel)
+    #     return self.channel['items'][0]['snippet']['title']
 
     @classmethod
     def get_service(cls):
