@@ -24,7 +24,11 @@ class Channel:
         self.video_count = self.channel['items'][0]['statistics']['videoCount']
         self.view_count = self.channel['items'][0]['statistics']['viewCount']
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Выводит информацию для пользователя"""
+        return f'{str(self.title)}, ({self.url})'
+
+    def __add__(self, other) -> int:
         """__str__
         +
         """
